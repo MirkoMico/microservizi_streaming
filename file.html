@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elenco Schede Video</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+  }
+  .video-card {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  video {
+    width: 100%;
+  }
+</style>
+</head>
+<body>
+<div id="video-list"></div>
+
+<script>
+  // Funzione per ottenere l'elenco dei video
+  async function getVideoList() {
+    try {
+      const response = await fetch('http://localhost:8085/movie-info/list');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Errore durante il recupero dell\'elenco dei video:', error);
+      return [];
+    }
+  }
+
+  // Funzione per aggiungere una scheda video alla pagina
+  function addVideoCard(video) {
+    const videoListDiv = document.getElementById('video-list');
+
+    const videoCard = document.createElement('div');
+    videoCard.classList.add('video-card');
+
+    const videoDescription = document.createElement('p');
+    videoDescription.textContent = video.description;
+    videoCard.appendChild(videoDescription);
+
+    const videoPlayer = document.createElement('video');
+    videoPlayer.controls = true;
+    const source = document.createElement('source');
+    source.src = `http://localhost:8085/stream/with-id/${video.id}`;
+    source.type = 'video/mp4';
+    videoPlayer.appendChild(source);
+    videoCard.appendChild(videoPlayer);
+
+    videoListDiv.appendChild(videoCard);
+  }
+
+  // Caricamento iniziale della pagina
+  async function init() {
+    const videoList = await getVideoList();
+    videoList.forEach(addVideoCard);
+  }
+
+  init();
+</script>
+</body>
+</html>
